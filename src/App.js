@@ -1,25 +1,55 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import './App.css'; 
+import CustomForm from './components/CustomForm';
+import DataDisplay from './components/DataDisplay';
 
-function App() {
+const App = () => {
+  const [items, setItems] = useState([]);
+  console.log("items", items)
+  const [selectedItemId, setSelectedItemId] = useState(null);
+  const [selectedState, setSelectedState] = useState(null);
+
+  const handleFormSubmit = (formData) => {
+    if (selectedItemId === null) {
+      // Add new item
+      setItems([...items, formData]);
+    } else {
+      // Edit existing item
+      const updatedItems = items.map((item) =>
+        item.id === selectedItemId ? formData : item
+      );
+      setItems(updatedItems);
+      setSelectedItemId(null);
+    }
+    setSelectedState(null);
+  };
+
+  const handleEdit = (id) => {
+    setSelectedItemId(id);
+    const selectedItem = items.find((item) => item.id === id);
+    if (selectedItem) {
+      setSelectedState(selectedItem); 
+    }
+  };
+
+  const handleDelete = (id) => {
+    // Delete item logic
+    const updatedItems = items.filter((item) => item.id !== id);
+    setItems(updatedItems);
+
+    // Reset selectedState after item deletion
+    setSelectedState(null);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <CustomForm
+        onFormSubmit={handleFormSubmit}
+        initialValues={selectedState}
+      />
+      <DataDisplay items={items} onEdit={handleEdit} onDelete={handleDelete} />
     </div>
   );
-}
+};
 
 export default App;
